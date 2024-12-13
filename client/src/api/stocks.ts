@@ -1,0 +1,132 @@
+import api from './api';
+
+// Get Daily Stock Data
+// GET /api/stocks/daily
+// Response: { data: Array<{ date: string, open: number, high: number, low: number, close: number, volume: number, dividend: number }> }
+export const getDailyStockData = (symbol: string) => {
+  // Mocking the response
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      // Generate 30 days of mock data
+      const data = Array.from({ length: 30 }, (_, i) => {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        const basePrice = 100 + Math.random() * 50;
+        return {
+          date: date.toISOString().split('T')[0],
+          open: basePrice + Math.random() * 5,
+          high: basePrice + Math.random() * 10,
+          low: basePrice - Math.random() * 5,
+          close: basePrice + Math.random() * 3,
+          volume: Math.floor(Math.random() * 1000000) + 500000,
+          dividend: Math.random() < 0.1 ? 0.5 + Math.random() : 0
+        };
+      }).reverse();
+      resolve({ data });
+    }, 500);
+  });
+};
+
+// Get Weekly Stock Data
+// GET /api/stocks/weekly
+// Response: { data: Array<{ date: string, open: number, high: number, low: number, close: number, volume: number, dividend: number }> }
+export const getWeeklyStockData = (symbol: string) => {
+  // Mocking the response
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      // Generate 52 weeks of mock data
+      const data = Array.from({ length: 52 }, (_, i) => {
+        const date = new Date();
+        date.setDate(date.getDate() - (i * 7));
+        const basePrice = 100 + Math.random() * 50;
+        return {
+          date: `${date.getFullYear()}-W${Math.floor(i / 52 * 100)}`,
+          open: basePrice + Math.random() * 5,
+          high: basePrice + Math.random() * 10,
+          low: basePrice - Math.random() * 5,
+          close: basePrice + Math.random() * 3,
+          volume: Math.floor(Math.random() * 5000000) + 2000000,
+          dividend: Math.random() < 0.2 ? 0.5 + Math.random() : 0
+        };
+      }).reverse();
+      resolve({ data });
+    }, 500);
+  });
+};
+
+// Get Monthly Stock Data
+// GET /api/stocks/monthly
+// Response: { data: Array<{ date: string, open: number, high: number, low: number, close: number, volume: number, dividend: number }> }
+export const getMonthlyStockData = (symbol: string) => {
+  // Mocking the response
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      // Generate 24 months of mock data
+      const data = Array.from({ length: 24 }, (_, i) => {
+        const date = new Date();
+        date.setMonth(date.getMonth() - i);
+        const basePrice = 100 + Math.random() * 50;
+        return {
+          date: date.toISOString().slice(0, 7),
+          open: basePrice + Math.random() * 5,
+          high: basePrice + Math.random() * 10,
+          low: basePrice - Math.random() * 5,
+          close: basePrice + Math.random() * 3,
+          volume: Math.floor(Math.random() * 20000000) + 8000000,
+          dividend: Math.random() < 0.3 ? 0.5 + Math.random() : 0
+        };
+      }).reverse();
+      resolve({ data });
+    }, 500);
+  });
+};
+
+// Get User's Favorite Stocks
+// GET /api/stocks/favorites
+// Response: { stocks: Array<{ symbol: string, name: string }> }
+export const getFavoriteStocks = () => {
+  // Mocking the response
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        stocks: [
+          { symbol: 'AAPL', name: 'Apple Inc.' },
+          { symbol: 'GOOGL', name: 'Alphabet Inc.' },
+          { symbol: 'MSFT', name: 'Microsoft Corporation' },
+        ]
+      });
+    }, 500);
+  });
+};
+
+// Add Stock to Favorites
+// POST /api/stocks/favorites/add
+// Request: { symbol: string }
+// Response: { success: boolean, message: string }
+export const addToFavorites = (symbol: string) => {
+  // Mocking the response
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        success: true,
+        message: 'Stock added to favorites successfully'
+      });
+    }, 500);
+  });
+};
+
+// Remove Stock from Favorites
+// DELETE /api/stocks/favorites/remove
+// Request: { symbol: string }
+// Response: { success: boolean, message: string }
+export const removeFromFavorites = (symbol: string) => {
+  // Mocking the response
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        success: true,
+        message: 'Stock removed from favorites successfully'
+      });
+    }, 500);
+  });
+};
