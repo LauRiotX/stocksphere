@@ -4,9 +4,7 @@ const { requireUser } = require('./middleware/auth');
 
 const router = express.Router();
 
-router.get('/favorites', (req, res, next) => {
-  console.log('Entering /favorites route');
-  next();
-}, requireUser, StockController.getFavoriteStocks);
+router.get('/favorites', requireUser, StockController.getFavoriteStocks);
+router.post('/favorites/add', requireUser, StockController.addToFavorites);
 
 module.exports = router;

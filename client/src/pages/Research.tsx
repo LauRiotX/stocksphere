@@ -104,10 +104,10 @@ export function Research() {
     if (!currentSymbol) return;
 
     try {
-      await addToFavorites(currentSymbol);
+      const result = await addToFavorites(currentSymbol);
       toast({
         title: "Success",
-        description: t('Stock added to favorites'),
+        description: result.message,
       });
     } catch (error) {
       toast({

@@ -4,7 +4,7 @@ import api from './api';
 // GET /api/stocks/daily
 // Response: { data: Array<{ date: string, open: number, high: number, low: number, close: number, volume: number, dividend: number }> }
 export const getDailyStockData = (symbol: string) => {
-  // Mocking the response 
+  // Mocking the response
   return new Promise((resolve) => {
     setTimeout(() => {
       // Generate 30 days of mock data
@@ -98,17 +98,17 @@ export const getFavoriteStocks = async () => {
 // Add Stock to Favorites
 // POST /api/stocks/favorites/add
 // Request: { symbol: string }
-// Response: { success: boolean, message: string }
-export const addToFavorites = (symbol: string) => {
-  // Mocking the response
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        success: true,
-        message: 'Stock added to favorites successfully'
-      });
-    }, 500);
-  });
+// Response: { stocks: string[], message: string }
+export const addToFavorites = async (symbol: string) => {
+  try {
+    console.log('Adding stock to favorites:', symbol);
+    const response = await api.post('/api/stocks/favorites/add', { symbol });
+    console.log('Successfully added stock to favorites:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error adding stock to favorites:', error);
+    throw new Error(error?.response?.data?.error || error.message);
+  }
 };
 
 // Remove Stock from Favorites
