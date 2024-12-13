@@ -106,7 +106,7 @@ router.get('/profile', requireUser, async (req, res) => {
   try {
     console.log('Fetching profile for user:', req.user.userId);
     const user = await User.findById(req.user.userId);
-    
+
     if (!user) {
       console.log('User not found for profile request');
       return res.status(404).json({ error: 'User not found' });
@@ -121,6 +121,48 @@ router.get('/profile', requireUser, async (req, res) => {
   } catch (error) {
     console.error('Error fetching user profile:', error);
     res.status(500).json({ error: 'Error fetching user profile' });
+  }
+});
+
+router.put('/profile', requireUser, async (req, res) => {
+  try {
+    console.log('Profile update attempt for user:', req.user.userId);
+    const { name, email } = req.body;
+    const userId = req.user.userId;
+
+    if (!name && !email) {
+      console.log('No update data provided');
+      return res.status(400).json({ error: 'No update data provided' });
+    }
+
+    if (email) {
+      const existingUser = await User.findOne({ email, _id: { $ne: userId } });
+      if (existingUser) {
+        console.log('Email already in use:', email);
+        return res.status(400).json({ error: 'Email already in use' });
+      }
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { name, email },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedUser) {
+      console.log('User not found for update');
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    console.log('Profile updated successfully for user:', updatedUser.email);
+    res.json({
+      email: updatedUser.email,
+      name: updatedUser.name,
+      createdAt: updatedUser.createdAt
+    });
+  } catch (error) {
+    console.error('Error updating user profile:', error.stack);
+    res.status(400).json({ error: error.message });
   }
 });
 
