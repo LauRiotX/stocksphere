@@ -123,7 +123,66 @@ async function getWeeklyStockData(symbol) {
   }
 }
 
+async function getMonthlyStockData(symbol) {
+  logger.info(`Fetching monthly stock data for symbol: ${symbol}`);
+
+  try {
+    if (!API_KEY) {
+      logger.error('ALPHA_VANTAGE_API_KEY environment variable is not set');
+      throw new Error('Alpha Vantage API key is not configured');
+    }
+
+    const response = await axios.get(BASE_URL, {
+      params: {
+        function: 'TIME_SERIES_MONTHLY',
+        symbol: symbol,
+        apikey: API_KEY
+      }
+    });
+
+    if (!response.data || !response.data['Monthly Time Series']) {
+      logger.error('Invalid response format from Alpha Vantage API', response.data);
+      throw new Error('Invalid response from Alpha Vantage API');
+    }
+
+    const timeSeriesData = response.data['Monthly Time Series'];
+
+    const formattedData = Object.entries(timeSeriesData).map(([date, values]) => ({
+      date,
+      open: parseFloat(values['1. open']),
+      high: parseFloat(values['2. high']),
+      low: parseFloat(values['3. low']),
+      close: parseFloat(values['4. close']),
+      volume: parseInt(values['5. volume']),
+      dividend: parseFloat(values['7. dividend amount'])
+    }));
+
+    const last24Months = formattedData.slice(0, 24).reverse();
+
+    logger.info(`Successfully fetched monthly data for ${symbol}: ${last24Months.length} records`);
+
+    return last24Months;
+
+  } catch (error) {
+    logger.error({
+      err: error,
+      symbol: symbol,
+      msg: 'Error fetching monthly stock data from Alpha Vantage'
+    });
+
+    if (error.response) {
+      logger.error('Alpha Vantage API error response:', {
+        status: error.response.status,
+        data: error.response.data
+      });
+    }
+
+    throw new Error(`Failed to fetch monthly stock data: ${error.message}`);
+  }
+}
+
 module.exports = {
   getDailyStockData,
-  getWeeklyStockData
+  getWeeklyStockData,
+  getMonthlyStockData
 };

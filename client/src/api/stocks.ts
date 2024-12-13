@@ -31,30 +31,18 @@ export const getWeeklyStockData = async (symbol: string) => {
 };
 
 // Get Monthly Stock Data
-// GET /api/stocks/monthly
+// GET /api/stocks/monthly/:symbol
 // Response: { data: Array<{ date: string, open: number, high: number, low: number, close: number, volume: number, dividend: number }> }
-export const getMonthlyStockData = (symbol: string) => {
-  // Mocking the response
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // Generate 24 months of mock data
-      const data = Array.from({ length: 24 }, (_, i) => {
-        const date = new Date();
-        date.setMonth(date.getMonth() - i);
-        const basePrice = 100 + Math.random() * 50;
-        return {
-          date: date.toISOString().slice(0, 7),
-          open: basePrice + Math.random() * 5,
-          high: basePrice + Math.random() * 10,
-          low: basePrice - Math.random() * 5,
-          close: basePrice + Math.random() * 3,
-          volume: Math.floor(Math.random() * 20000000) + 8000000,
-          dividend: Math.random() < 0.3 ? 0.5 + Math.random() : 0
-        };
-      }).reverse();
-      resolve({ data });
-    }, 500);
-  });
+export const getMonthlyStockData = async (symbol: string) => {
+  try {
+    console.log('Fetching monthly stock data for symbol:', symbol);
+    const response = await api.get(`/api/stocks/monthly/${symbol}`);
+    console.log('Successfully fetched monthly stock data:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching monthly stock data:', error);
+    throw new Error(error?.response?.data?.error || error.message);
+  }
 };
 
 // Get User's Favorite Stocks
