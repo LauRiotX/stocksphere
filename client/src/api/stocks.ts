@@ -114,15 +114,15 @@ export const addToFavorites = async (symbol: string) => {
 // Remove Stock from Favorites
 // DELETE /api/stocks/favorites/remove
 // Request: { symbol: string }
-// Response: { success: boolean, message: string }
-export const removeFromFavorites = (symbol: string) => {
-  // Mocking the response
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        success: true,
-        message: 'Stock removed from favorites successfully'
-      });
-    }, 500);
-  });
+// Response: { stocks: string[], message: string }
+export const removeFromFavorites = async (symbol: string) => {
+  try {
+    console.log('Removing stock from favorites:', symbol);
+    const response = await api.delete('/api/stocks/favorites/remove', { data: { symbol } });
+    console.log('Successfully removed stock from favorites:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error removing stock from favorites:', error);
+    throw new Error(error?.response?.data?.error || error.message);
+  }
 };

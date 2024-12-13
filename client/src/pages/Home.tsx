@@ -69,11 +69,11 @@ export function Home() {
 
   const handleRemoveFromFavorites = async (symbol: string) => {
     try {
-      await removeFromFavorites(symbol);
+      const result = await removeFromFavorites(symbol);
       setStocks(stocks.filter(stock => stock.symbol !== symbol));
       toast({
         title: "Success",
-        description: t('Stock removed from favorites'),
+        description: result.message,
       });
     } catch (error) {
       toast({

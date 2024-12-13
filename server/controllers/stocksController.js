@@ -30,6 +30,23 @@ class StockController {
       res.status(500).json({ error: error.message });
     }
   }
+
+  static async removeFromFavorites(req, res) {
+    console.log('StockController.removeFromFavorites called');
+    console.log('User in request:', req.user);
+    const { symbol } = req.body;
+    if (!symbol) {
+      return res.status(400).json({ error: 'Stock symbol is required' });
+    }
+    try {
+      const updatedFavorites = await StockService.removeFavoriteStock(req.user.id, symbol);
+      console.log(`Removed ${symbol} from favorites for user ${req.user.id}`);
+      res.json({ stocks: updatedFavorites, message: 'Stock removed from favorites successfully' });
+    } catch (error) {
+      console.error('Error removing stock from favorites:', error);
+      res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 module.exports = StockController;
