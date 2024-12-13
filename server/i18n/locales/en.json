@@ -1,0 +1,12 @@
+{
+  "invalidCredentials": "Invalid credentials",
+  "internalServerError": "Internal server error",
+  "emailAlreadyRegistered": "Email already registered",
+  "userNotFound": "User not found",
+  "refreshTokenRequired": "Refresh token required",
+  "invalidRefreshToken": "Invalid refresh token",
+  "noUpdateDataProvided": "No update data provided",
+  "emailAlreadyInUse": "Email already in use",
+  "unauthorized": "Unauthorized",
+  "authenticationRequired": "Authentication required"
+}

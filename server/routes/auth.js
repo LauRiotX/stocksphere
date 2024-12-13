@@ -14,13 +14,13 @@ router.post('/login', async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) {
       console.log('User not found');
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return res.status(401).json({ message: req.t('invalidCredentials') });
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
       console.log('Invalid password');
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return res.status(401).json({ message: req.t('invalidCredentials') });
     }
 
     const accessToken = jwt.sign(
@@ -38,7 +38,7 @@ router.post('/login', async (req, res) => {
     res.json({ accessToken, refreshToken });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: req.t('internalServerError') });
   }
 });
 
@@ -52,7 +52,7 @@ router.post('/register', async (req, res) => {
 
     if (existingUser) {
       console.log('Email already registered:', email);
-      return res.status(400).json({ message: 'Email already registered' });
+      return res.status(400).json({ message: req.t('emailAlreadyRegistered') });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -72,7 +72,7 @@ router.post('/register', async (req, res) => {
     res.json({ accessToken });
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: req.t('internalServerError') });
   }
 });
 
@@ -80,14 +80,14 @@ router.post('/refresh', async (req, res) => {
   try {
     const { refreshToken } = req.body;
     if (!refreshToken) {
-      return res.status(401).json({ message: 'Refresh token required' });
+      return res.status(401).json({ message: req.t('refreshTokenRequired') });
     }
 
     const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
     const user = await User.findById(decoded.userId);
 
     if (!user) {
-      return res.status(401).json({ message: 'User not found' });
+      return res.status(401).json({ message: req.t('userNotFound') });
     }
 
     const accessToken = jwt.sign(
@@ -99,7 +99,7 @@ router.post('/refresh', async (req, res) => {
     res.json({ accessToken });
   } catch (error) {
     console.error('Token refresh error:', error);
-    res.status(401).json({ message: 'Invalid refresh token' });
+    res.status(401).json({ message: req.t('invalidRefreshToken') });
   }
 });
 
@@ -107,10 +107,10 @@ router.get('/profile', requireUser, async (req, res) => {
   try {
     console.log('Fetching profile for user:', req.user.id);
     const user = await UserService.get(req.user.id);
-    
+
     if (!user) {
       console.log('User not found for profile request');
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: req.t('userNotFound') });
     }
 
     console.log('Profile retrieved successfully for user:', user.email);
@@ -122,7 +122,7 @@ router.get('/profile', requireUser, async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching user profile:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: req.t('internalServerError') });
   }
 });
 
@@ -134,14 +134,14 @@ router.put('/profile', requireUser, async (req, res) => {
 
     if (!name && !email) {
       console.log('No update data provided');
-      return res.status(400).json({ error: 'No update data provided' });
+      return res.status(400).json({ error: req.t('noUpdateDataProvided') });
     }
 
     if (email) {
       const existingUser = await User.findOne({ email, _id: { $ne: userId } });
       if (existingUser) {
         console.log('Email already in use:', email);
-        return res.status(400).json({ error: 'Email already in use' });
+        return res.status(400).json({ error: req.t('emailAlreadyInUse') });
       }
     }
 
@@ -153,7 +153,7 @@ router.put('/profile', requireUser, async (req, res) => {
 
     if (!updatedUser) {
       console.log('User not found for update');
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: req.t('userNotFound') });
     }
 
     console.log('Profile updated successfully for user:', updatedUser.email);

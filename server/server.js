@@ -4,6 +4,8 @@ const express = require("express");
 const cors = require("cors");
 const basicRoutes = require("./routes/index");
 const authRoutes = require("./routes/auth");
+const i18next = require('./i18n');
+const i18nextMiddleware = require('i18next-http-middleware');
 
 if (!process.env.DATABASE_URL) {
   console.error("Error: DATABASE_URL variable in .env missing.");
@@ -18,11 +20,14 @@ app.use(cors({
   origin: 'http://localhost:5173', // Vite's default port
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept-Language']
 }));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Add i18next middleware
+app.use(i18nextMiddleware.handle(i18next));
 
 // Pretty-print JSON responses
 app.enable('json spaces');
@@ -53,14 +58,14 @@ app.use('/api/stocks', require('./routes/stocks'));
 
 // If no routes handled the request, it's a 404
 app.use((req, res, next) => {
-  res.status(404).json({ message: "Resource not found" });
+  res.status(404).json({ message: req.t("resourceNotFound", "Resource not found") });
 });
 
 // Error handling
 app.use((err, req, res, next) => {
   console.error(`Unhandled application error: ${err.message}`);
   console.error(err.stack);
-  res.status(500).json({ message: "Internal server error" });
+  res.status(500).json({ message: req.t("internalServerError", "Internal server error") });
 });
 
 app.listen(port, () => {

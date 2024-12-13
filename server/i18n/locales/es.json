@@ -1,0 +1,12 @@
+{
+  "invalidCredentials": "Credenciales inválidas",
+  "internalServerError": "Error interno del servidor",
+  "emailAlreadyRegistered": "El correo electrónico ya está registrado",
+  "userNotFound": "Usuario no encontrado",
+  "refreshTokenRequired": "Se requiere token de actualización",
+  "invalidRefreshToken": "Token de actualización inválido",
+  "noUpdateDataProvided": "No se proporcionaron datos para actualizar", 
+  "emailAlreadyInUse": "El correo electrónico ya está en uso",
+  "unauthorized": "No autorizado",
+  "authenticationRequired": "Se requiere autenticación"
+}

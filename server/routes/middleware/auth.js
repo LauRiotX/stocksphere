@@ -26,7 +26,7 @@ const requireUser = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) {
     console.log('No token found in Authorization header');
-    return res.status(401).json({ message: 'Unauthorized' });
+    return res.status(401).json({ message: req.t('unauthorized') });
   }
 
   try {
@@ -37,7 +37,7 @@ const requireUser = (req, res, next) => {
     next();
   } catch (err) {
     console.error('Error verifying token:', err);
-    return res.status(403).json({ error: 'Authentication required' });
+    return res.status(403).json({ error: req.t('authenticationRequired') });
   }
 };
 
