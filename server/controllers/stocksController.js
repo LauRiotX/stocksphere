@@ -1,4 +1,5 @@
 const StockService = require('../services/stockService');
+const AlphaVantageService = require('../services/alphaVantageService');
 
 class StockController {
   static async getFavoriteStocks(req, res) {
@@ -44,6 +45,24 @@ class StockController {
       res.json({ stocks: updatedFavorites, message: 'Stock removed from favorites successfully' });
     } catch (error) {
       console.error('Error removing stock from favorites:', error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  static async getDailyStockData(req, res) {
+    console.log('StockController.getDailyStockData called');
+    try {
+      const { symbol } = req.params;
+      if (!symbol) {
+        console.error('Missing symbol parameter');
+        return res.status(400).json({ error: 'Stock symbol is required' });
+      }
+      console.log(`Fetching daily stock data for symbol: ${symbol}`);
+      const data = await AlphaVantageService.getDailyStockData(symbol);
+      console.log(`Successfully retrieved daily stock data for ${symbol}`);
+      res.json({ data });
+    } catch (error) {
+      console.error('Error in getDailyStockData:', error);
       res.status(500).json({ error: error.message });
     }
   }

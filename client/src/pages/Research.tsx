@@ -41,7 +41,7 @@ const METRIC_COLORS = {
 export function Research() {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const { register, handleSubmit } = useForm<StockForm>();
+  const { register, handleSubmit, formState: { errors } } = useForm<StockForm>();
   const [stockData, setStockData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [currentSymbol, setCurrentSymbol] = useState<string>('');
@@ -57,14 +57,17 @@ export function Research() {
   const onSubmit = async (data: StockForm) => {
     try {
       setLoading(true);
+      console.log('Fetching daily stock data for symbol:', data.symbol);
       const response = await getDailyStockData(data.symbol);
+      console.log('Received stock data:', response.data);
       setStockData(response.data);
       setCurrentSymbol(data.symbol);
     } catch (error) {
+      console.error('Error fetching stock data:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message,
+        description: error.message || 'Failed to fetch stock data',
       });
     } finally {
       setLoading(false);
@@ -76,6 +79,7 @@ export function Research() {
 
     try {
       setLoading(true);
+      console.log(`Fetching ${period} stock data for symbol:`, currentSymbol);
       let response;
       switch (period) {
         case 'daily':
@@ -87,13 +91,17 @@ export function Research() {
         case 'monthly':
           response = await getMonthlyStockData(currentSymbol);
           break;
+        default:
+          throw new Error('Invalid period selected');
       }
+      console.log(`Received ${period} stock data:`, response.data);
       setStockData(response.data);
     } catch (error) {
+      console.error(`Error fetching ${period} stock data:`, error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message,
+        description: error.message || `Failed to fetch ${period} stock data`,
       });
     } finally {
       setLoading(false);
@@ -104,16 +112,19 @@ export function Research() {
     if (!currentSymbol) return;
 
     try {
+      console.log('Adding stock to favorites:', currentSymbol);
       const result = await addToFavorites(currentSymbol);
+      console.log('Successfully added to favorites:', result);
       toast({
         title: "Success",
         description: result.message,
       });
     } catch (error) {
+      console.error('Error adding stock to favorites:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message,
+        description: error.message || 'Failed to add stock to favorites',
       });
     }
   };
@@ -130,7 +141,7 @@ export function Research() {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">{t('stockResearch')}</h1>
         {currentSymbol && (
-          <Button onClick={handleAddToFavorites}>
+          <Button onClick={handleAddToFavorites} disabled={loading}>
             <Star className="mr-2 h-4 w-4" />
             {t('addToFavorites')}
           </Button>
@@ -143,12 +154,21 @@ export function Research() {
             <div className="flex-1">
               <Input
                 placeholder={t('stockCode')}
-                {...register('symbol', { required: true })}
+                {...register('symbol', {
+                  required: 'Stock symbol is required',
+                  pattern: {
+                    value: /^[A-Za-z]{1,5}$/,
+                    message: 'Invalid stock symbol format'
+                  }
+                })}
               />
+              {errors.symbol && (
+                <p className="text-sm text-red-500 mt-1">{errors.symbol.message}</p>
+              )}
             </div>
             <Button type="submit" disabled={loading}>
               <Search className="mr-2 h-4 w-4" />
-              {t('search')}
+              {loading ? t('searching') : t('search')}
             </Button>
           </form>
         </CardContent>
@@ -177,9 +197,9 @@ export function Research() {
             <CardContent className="pt-6">
               <Tabs defaultValue="daily" onValueChange={handleTabChange}>
                 <TabsList>
-                  <TabsTrigger value="daily">{t('daily')}</TabsTrigger>
-                  <TabsTrigger value="weekly">{t('weekly')}</TabsTrigger>
-                  <TabsTrigger value="monthly">{t('monthly')}</TabsTrigger>
+                  <TabsTrigger value="daily" disabled={loading}>{t('daily')}</TabsTrigger>
+                  <TabsTrigger value="weekly" disabled={loading}>{t('weekly')}</TabsTrigger>
+                  <TabsTrigger value="monthly" disabled={loading}>{t('monthly')}</TabsTrigger>
                 </TabsList>
                 <TabsContent value="daily">
                   <div className="h-[400px]">

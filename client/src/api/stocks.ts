@@ -1,30 +1,18 @@
 import api from './api';
 
 // Get Daily Stock Data
-// GET /api/stocks/daily
+// GET /api/stocks/daily/:symbol
 // Response: { data: Array<{ date: string, open: number, high: number, low: number, close: number, volume: number, dividend: number }> }
-export const getDailyStockData = (symbol: string) => {
-  // Mocking the response
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // Generate 30 days of mock data
-      const data = Array.from({ length: 30 }, (_, i) => {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        const basePrice = 100 + Math.random() * 50;
-        return {
-          date: date.toISOString().split('T')[0],
-          open: basePrice + Math.random() * 5,
-          high: basePrice + Math.random() * 10,
-          low: basePrice - Math.random() * 5,
-          close: basePrice + Math.random() * 3,
-          volume: Math.floor(Math.random() * 1000000) + 500000,
-          dividend: Math.random() < 0.1 ? 0.5 + Math.random() : 0
-        };
-      }).reverse();
-      resolve({ data });
-    }, 500);
-  });
+export const getDailyStockData = async (symbol: string) => {
+  try {
+    console.log('Fetching daily stock data for symbol:', symbol);
+    const response = await api.get(`/api/stocks/daily/${symbol}`);
+    console.log('Successfully fetched daily stock data:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching daily stock data:', error);
+    throw new Error(error?.response?.data?.error || error.message);
+  }
 };
 
 // Get Weekly Stock Data
