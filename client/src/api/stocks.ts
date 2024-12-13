@@ -16,30 +16,18 @@ export const getDailyStockData = async (symbol: string) => {
 };
 
 // Get Weekly Stock Data
-// GET /api/stocks/weekly
+// GET /api/stocks/weekly/:symbol
 // Response: { data: Array<{ date: string, open: number, high: number, low: number, close: number, volume: number, dividend: number }> }
-export const getWeeklyStockData = (symbol: string) => {
-  // Mocking the response
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // Generate 52 weeks of mock data
-      const data = Array.from({ length: 52 }, (_, i) => {
-        const date = new Date();
-        date.setDate(date.getDate() - (i * 7));
-        const basePrice = 100 + Math.random() * 50;
-        return {
-          date: `${date.getFullYear()}-W${Math.floor(i / 52 * 100)}`,
-          open: basePrice + Math.random() * 5,
-          high: basePrice + Math.random() * 10,
-          low: basePrice - Math.random() * 5,
-          close: basePrice + Math.random() * 3,
-          volume: Math.floor(Math.random() * 5000000) + 2000000,
-          dividend: Math.random() < 0.2 ? 0.5 + Math.random() : 0
-        };
-      }).reverse();
-      resolve({ data });
-    }, 500);
-  });
+export const getWeeklyStockData = async (symbol: string) => {
+  try {
+    console.log('Fetching weekly stock data for symbol:', symbol);
+    const response = await api.get(`/api/stocks/weekly/${symbol}`);
+    console.log('Successfully fetched weekly stock data:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching weekly stock data:', error);
+    throw new Error(error?.response?.data?.error || error.message);
+  }
 };
 
 // Get Monthly Stock Data

@@ -66,6 +66,24 @@ class StockController {
       res.status(500).json({ error: error.message });
     }
   }
+
+  static async getWeeklyStockData(req, res) {
+    console.log('StockController.getWeeklyStockData called');
+    try {
+      const { symbol } = req.params;
+      if (!symbol) {
+        console.error('Missing symbol parameter');
+        return res.status(400).json({ error: 'Stock symbol is required' });
+      }
+      console.log(`Fetching weekly stock data for symbol: ${symbol}`);
+      const data = await AlphaVantageService.getWeeklyStockData(symbol);
+      console.log(`Successfully retrieved weekly stock data for ${symbol}`);
+      res.json({ data });
+    } catch (error) {
+      console.error('Error in getWeeklyStockData:', error);
+      res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 module.exports = StockController;
