@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getFavoriteStocks, removeFromFavorites } from '@/api/stocks';
+import { getUserProfile } from '@/api/auth';
 import { Star, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/useToast';
+import { UserProfile } from '@/components/UserProfile';
 
 type FavoriteStock = {
   symbol: string;
@@ -20,10 +22,25 @@ export function Home() {
   const { toast } = useToast();
   const [stocks, setStocks] = useState<FavoriteStock[]>([]);
   const [loading, setLoading] = useState(true);
+  const [userProfile, setUserProfile] = useState(null);
 
   useEffect(() => {
     loadFavoriteStocks();
+    fetchUserProfile();
   }, []);
+
+  const fetchUserProfile = async () => {
+    try {
+      const profile = await getUserProfile();
+      setUserProfile(profile);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: t('Error'),
+        description: error.message,
+      });
+    }
+  };
 
   const loadFavoriteStocks = async () => {
     try {
@@ -68,7 +85,11 @@ export function Home() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">{t('stockPerformance')}</h1>
+      <h1 className="text-3xl font-bold">{t('Welcome to StockSphere')}</h1>
+      
+      {userProfile && <UserProfile {...userProfile} />}
+
+      <h2 className="text-2xl font-bold mt-6">{t('stockPerformance')}</h2>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {stocks.map((stock) => (
           <Card key={stock.symbol} className="backdrop-blur-lg bg-background/60">

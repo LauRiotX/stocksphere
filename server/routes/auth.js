@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const router = express.Router();
+const { requireUser } = require('./middleware/auth');
 
 router.post('/login', async (req, res) => {
   try {
@@ -98,6 +99,28 @@ router.post('/refresh', async (req, res) => {
   } catch (error) {
     console.error('Token refresh error:', error);
     res.status(401).json({ message: 'Invalid refresh token' });
+  }
+});
+
+router.get('/profile', requireUser, async (req, res) => {
+  try {
+    console.log('Fetching profile for user:', req.user.userId);
+    const user = await User.findById(req.user.userId);
+    
+    if (!user) {
+      console.log('User not found for profile request');
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    console.log('Profile retrieved successfully for user:', user.email);
+    res.json({
+      email: user.email,
+      name: user.name,
+      createdAt: user.createdAt
+    });
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    res.status(500).json({ error: 'Error fetching user profile' });
   }
 });
 

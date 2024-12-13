@@ -40,6 +40,20 @@ export const googleLogin = async (credential: string) => {
   }
 };
 
+// Get User Profile
+export const getUserProfile = async () => {
+  try {
+    console.log('API: Fetching user profile');
+    const response = await api.get('/api/auth/profile');
+    console.log('API: Successfully retrieved user profile', response.data);
+    return response.data;
+  } catch (error) {
+    console.log('API: Error fetching user profile', error);
+    console.log('API: Error response:', error.response?.data);
+    throw new Error(error?.response?.data?.error || error.message);
+  }
+};
+
 // Logout
 export const logout = () => {
   console.log('API: Clearing authentication tokens');
