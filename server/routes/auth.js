@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const router = express.Router();
 const { requireUser } = require('./middleware/auth');
+const UserService = require('../services/user');
 
 router.post('/login', async (req, res) => {
   try {
@@ -104,23 +105,24 @@ router.post('/refresh', async (req, res) => {
 
 router.get('/profile', requireUser, async (req, res) => {
   try {
-    console.log('Fetching profile for user:', req.user.userId);
-    const user = await User.findById(req.user.userId);
-
+    console.log('Fetching profile for user:', req.user.id);
+    const user = await UserService.get(req.user.id);
+    
     if (!user) {
       console.log('User not found for profile request');
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ message: 'User not found' });
     }
 
     console.log('Profile retrieved successfully for user:', user.email);
     res.json({
+      id: user._id,
       email: user.email,
       name: user.name,
       createdAt: user.createdAt
     });
   } catch (error) {
     console.error('Error fetching user profile:', error);
-    res.status(500).json({ error: 'Error fetching user profile' });
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 

@@ -48,9 +48,9 @@ export const getUserProfile = async () => {
     console.log('API: Successfully retrieved user profile', response.data);
     return response.data;
   } catch (error) {
-    console.log('API: Error fetching user profile', error);
+    console.log('API: Error fetching user profile:', error);
     console.log('API: Error response:', error.response?.data);
-    throw new Error(error?.response?.data?.error || error.message);
+    throw new Error(error?.response?.data?.message || 'Failed to fetch user profile');
   }
 };
 

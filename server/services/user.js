@@ -14,8 +14,9 @@ class UserService {
 
   static async get(id) {
     try {
-      return User.findOne({ _id: id }).exec();
+      return User.findById(id);
     } catch (err) {
+      console.error(`Error getting user ${id}:`, err);
       throw new Error(`Database error while getting the user by their ID: ${err}`);
     }
   }

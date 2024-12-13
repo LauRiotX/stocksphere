@@ -46,9 +46,10 @@ export function Home() {
     try {
       setLoading(true);
       const response = await getFavoriteStocks();
-      // Add mock performance data
-      const stocksWithPerformance = response.stocks.map(stock => ({
-        ...stock,
+      // Transform the response to match the expected format
+      const stocksWithPerformance = response.stocks.map(symbol => ({
+        symbol,
+        name: symbol, // You might want to fetch the company name from another API
         performance: {
           lastDay: Math.random() * 10 - 5, // Random number between -5 and 5
           monthlyAverage: Math.random() * 15 - 7.5, // Random number between -7.5 and 7.5
@@ -86,53 +87,59 @@ export function Home() {
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">{t('Welcome to StockSphere')}</h1>
-      
+
       {userProfile && <UserProfile {...userProfile} />}
 
       <h2 className="text-2xl font-bold mt-6">{t('stockPerformance')}</h2>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {stocks.map((stock) => (
-          <Card key={stock.symbol} className="backdrop-blur-lg bg-background/60">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg">{stock.symbol}</CardTitle>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleRemoveFromFavorites(stock.symbol)}
-              >
-                <Star className="h-4 w-4 fill-primary" />
-              </Button>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">{stock.name}</p>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">{t('lastBusinessDay')}</span>
-                  <div className={`flex items-center ${stock.performance.lastDay >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                    {stock.performance.lastDay >= 0 ? (
-                      <ArrowUpRight className="h-4 w-4" />
-                    ) : (
-                      <ArrowDownRight className="h-4 w-4" />
-                    )}
-                    <span>{Math.abs(stock.performance.lastDay).toFixed(2)}%</span>
+      {loading ? (
+        <p>{t('Loading...')}</p>
+      ) : stocks.length > 0 ? (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {stocks.map((stock) => (
+            <Card key={stock.symbol} className="backdrop-blur-lg bg-background/60">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="text-lg">{stock.symbol}</CardTitle>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleRemoveFromFavorites(stock.symbol)}
+                >
+                  <Star className="h-4 w-4 fill-primary" />
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">{stock.name}</p>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">{t('lastBusinessDay')}</span>
+                    <div className={`flex items-center ${stock.performance.lastDay >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                      {stock.performance.lastDay >= 0 ? (
+                        <ArrowUpRight className="h-4 w-4" />
+                      ) : (
+                        <ArrowDownRight className="h-4 w-4" />
+                      )}
+                      <span>{Math.abs(stock.performance.lastDay).toFixed(2)}%</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">{t('monthlyAverage')}</span>
+                    <div className={`flex items-center ${stock.performance.monthlyAverage >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                      {stock.performance.monthlyAverage >= 0 ? (
+                        <ArrowUpRight className="h-4 w-4" />
+                      ) : (
+                        <ArrowDownRight className="h-4 w-4" />
+                      )}
+                      <span>{Math.abs(stock.performance.monthlyAverage).toFixed(2)}%</span>
+                    </div>
                   </div>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">{t('monthlyAverage')}</span>
-                  <div className={`flex items-center ${stock.performance.monthlyAverage >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                    {stock.performance.monthlyAverage >= 0 ? (
-                      <ArrowUpRight className="h-4 w-4" />
-                    ) : (
-                      <ArrowDownRight className="h-4 w-4" />
-                    )}
-                    <span>{Math.abs(stock.performance.monthlyAverage).toFixed(2)}%</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <p className="text-center text-gray-500">{t('No favorites yet')}</p>
+      )}
     </div>
   );
 }

@@ -49,6 +49,7 @@ app.on("error", (error) => {
 // Routes
 app.use('/', basicRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/stocks', require('./routes/stocks'));
 
 // If no routes handled the request, it's a 404
 app.use((req, res, next) => {

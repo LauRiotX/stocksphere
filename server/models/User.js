@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
   googleId: { type: String },
   name: { type: String },
   createdAt: { type: Date, default: Date.now },
+  favoriteStocks: [{ type: String }]
 });
 
 module.exports = mongoose.models.User || mongoose.model('User', userSchema);

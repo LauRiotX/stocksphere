@@ -22,14 +22,21 @@ const authenticateWithToken = (req, res, next) => {
 };
 
 const requireUser = (req, res, next) => {
+  console.log('Authorization header:', req.headers.authorization);
   const token = req.headers.authorization?.split(' ')[1];
-  if (!token) return res.status(401).json({ message: 'Unauthorized' });
+  if (!token) {
+    console.log('No token found in Authorization header');
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
+    console.log('Decoded token:', decoded);
+    req.user = { id: decoded.userId };
+    console.log('User set in request:', req.user);
     next();
   } catch (err) {
+    console.error('Error verifying token:', err);
     return res.status(403).json({ error: 'Authentication required' });
   }
 };

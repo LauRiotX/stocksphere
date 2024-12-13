@@ -4,7 +4,7 @@ import api from './api';
 // GET /api/stocks/daily
 // Response: { data: Array<{ date: string, open: number, high: number, low: number, close: number, volume: number, dividend: number }> }
 export const getDailyStockData = (symbol: string) => {
-  // Mocking the response
+  // Mocking the response 
   return new Promise((resolve) => {
     setTimeout(() => {
       // Generate 30 days of mock data
@@ -83,20 +83,16 @@ export const getMonthlyStockData = (symbol: string) => {
 
 // Get User's Favorite Stocks
 // GET /api/stocks/favorites
-// Response: { stocks: Array<{ symbol: string, name: string }> }
-export const getFavoriteStocks = () => {
-  // Mocking the response
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        stocks: [
-          { symbol: 'AAPL', name: 'Apple Inc.' },
-          { symbol: 'GOOGL', name: 'Alphabet Inc.' },
-          { symbol: 'MSFT', name: 'Microsoft Corporation' },
-        ]
-      });
-    }, 500);
-  });
+// Response: { stocks: Array<string> }
+export const getFavoriteStocks = async () => {
+  try {
+    const response = await api.get('/api/stocks/favorites');
+    console.log('Fetched favorite stocks:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching favorite stocks:', error);
+    throw new Error(error?.response?.data?.error || error.message);
+  }
 };
 
 // Add Stock to Favorites
