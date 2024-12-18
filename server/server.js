@@ -4,8 +4,11 @@ const express = require("express");
 const cors = require("cors");
 const basicRoutes = require("./routes/index");
 const authRoutes = require("./routes/auth");
+const translationsRoutes = require('./routes/translations');
 const i18next = require('./i18n');
 const i18nextMiddleware = require('i18next-http-middleware');
+
+console.log('Starting server...');
 
 if (!process.env.DATABASE_URL) {
   console.error("Error: DATABASE_URL variable in .env missing.");
@@ -46,6 +49,8 @@ mongoose
     process.exit(1);
   });
 
+console.log('Database connection attempt completed');
+
 app.on("error", (error) => {
   console.error(`Server error: ${error.message}`);
   console.error(error.stack);
@@ -55,6 +60,7 @@ app.on("error", (error) => {
 app.use('/', basicRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/stocks', require('./routes/stocks'));
+app.use('/api/translations', translationsRoutes);
 
 // If no routes handled the request, it's a 404
 app.use((req, res, next) => {
@@ -70,4 +76,5 @@ app.use((err, req, res, next) => {
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
+  console.log('Server startup complete');
 });

@@ -24,44 +24,50 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error: AxiosError): Promise<AxiosError> => Promise.reject(error)
+  (error: AxiosError): Promise<AxiosError> => {
+    console.error('Request interceptor error:', error);
+    return Promise.reject(error);
+  }
 );
 
-// Axios response interceptor: Handle 401 errors
+// Axios response interceptor: Handle 401/403 errors
 api.interceptors.response.use(
-  (response) => response, // If the response is successful, return it
+  (response) => response,
   async (error: AxiosError): Promise<any> => {
+    console.error('Response error:', error.message);
+    
     const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
 
-    // If the error is due to an expired access token
     if ([401, 403].includes(error.response?.status) && !originalRequest._retry) {
-      originalRequest._retry = true; // Mark the request as retried
+      console.log('Token expired, attempting refresh...');
+      originalRequest._retry = true;
 
       try {
-        // Attempt to refresh the token
         const { data } = await axios.post<{ accessToken: string }>(`${backendURL}/api/auth/refresh`, {
           refreshToken: localStorage.getItem('refreshToken'),
         });
+        
+        console.log('Token refresh successful');
         accessToken = data.accessToken;
+        localStorage.setItem('accessToken', accessToken);
 
-        // Retry the original request with the new token
         if (originalRequest.headers) {
           originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         }
+        
         return api(originalRequest);
       } catch (err) {
-        // If refresh fails, clear tokens and redirect to login
+        console.error('Token refresh failed:', err);
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('accessToken');
         accessToken = null;
-        window.location.href = '/login'; // Redirect to login page
+        window.location.href = '/login';
         return Promise.reject(err);
       }
     }
 
-    return Promise.reject(error); // Pass other errors through
+    return Promise.reject(error);
   }
 );
-
 
 export default api;

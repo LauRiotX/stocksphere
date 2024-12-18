@@ -1,5 +1,21 @@
 import api from './api';
 
+export const refreshToken = async () => {
+  const refreshToken = localStorage.getItem('refreshToken');
+  try {
+    console.log('API: Attempting to refresh access token');
+    const response = await api.post('/auth/refresh', { refreshToken });
+    const { accessToken } = response.data;
+    localStorage.setItem('accessToken', accessToken);
+    console.log('API: Successfully refreshed access token');
+    return accessToken;
+  } catch (error) {
+    console.error('API: Error refreshing token:', error);
+    console.error('API: Error response:', error.response?.data);
+    throw error;
+  }
+};
+
 export const login = async (email: string, password: string) => {
   try {
     console.log('API: Sending login request to server');

@@ -18,22 +18,25 @@ type FavoriteStock = {
 };
 
 export function Home() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { toast } = useToast();
   const [stocks, setStocks] = useState<FavoriteStock[]>([]);
   const [loading, setLoading] = useState(true);
   const [userProfile, setUserProfile] = useState(null);
 
   useEffect(() => {
+    console.log('Home component rendered. Current language:', i18n.language);
+    console.log('Translated text example:', t('Welcome to StockSphere'));
     loadFavoriteStocks();
     fetchUserProfile();
-  }, []);
+  }, [t, i18n.language]);
 
   const fetchUserProfile = async () => {
     try {
       const profile = await getUserProfile();
       setUserProfile(profile);
     } catch (error) {
+      console.error('Error fetching user profile:', error);
       toast({
         variant: "destructive",
         title: t('Error'),
@@ -44,6 +47,7 @@ export function Home() {
 
   const loadFavoriteStocks = async () => {
     try {
+      console.log('Loading favorite stocks...');
       setLoading(true);
       const response = await getFavoriteStocks();
       // Transform the response to match the expected format
@@ -55,8 +59,10 @@ export function Home() {
           monthlyAverage: Math.random() * 15 - 7.5, // Random number between -7.5 and 7.5
         }
       }));
+      console.log('Favorite stocks loaded successfully:', stocksWithPerformance);
       setStocks(stocksWithPerformance);
     } catch (error) {
+      console.error('Error loading favorite stocks:', error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -69,13 +75,16 @@ export function Home() {
 
   const handleRemoveFromFavorites = async (symbol: string) => {
     try {
+      console.log(`Removing stock ${symbol} from favorites...`);
       const result = await removeFromFavorites(symbol);
       setStocks(stocks.filter(stock => stock.symbol !== symbol));
+      console.log(`Stock ${symbol} successfully removed from favorites`);
       toast({
         title: "Success",
         description: result.message,
       });
     } catch (error) {
+      console.error(`Error removing stock ${symbol} from favorites:`, error);
       toast({
         variant: "destructive",
         title: "Error",
